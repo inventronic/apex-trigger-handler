@@ -208,7 +208,7 @@ Behavior:
 ## Usage Example (Account)
 
 Trigger (example):
-```
+```apex
 trigger AccountTrigger on Account(
   before insert,
   before update,
@@ -223,7 +223,7 @@ trigger AccountTrigger on Account(
 ```
 
 Handler (example):
-```
+```apex
 public with sharing class AccountTriggerHandler extends TriggerBase {
     public AccountTriggerHandler() {
         super(Account.SObjectType);
