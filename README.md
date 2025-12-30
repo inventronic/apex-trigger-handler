@@ -39,28 +39,28 @@ What you can control (Label (API Name)):
   - `After Undelete` (After_Undelete__c)
 - Depth guard — `Max Execution Count` (Max_Execution_Count__c)
 
-Quick reference:
+### Quick reference:
 - Disable all logic for an SObject: set `Active` (Active__c) = false
 - Enable only specific operations: set `Active` (Active__c) = true and turn on only the desired flags (e.g., `Before Insert` (Before_Insert__c) = true; others = false)
 - If the `Trigger_Registry__mdt` record or a specific flag is missing, that operation will not run
 
-Examples:
-1) Disable the whole trigger for Account
+### Examples:
+#### 1) Disable the whole trigger for Account
 - Record: `Trigger Registry Name` (DeveloperName) = Account
 - `Active` (Active__c) = false
 - Other flags are ignored
-Case sensitivity and naming rules:
-- Always match the Standard SObject API Name exactly in case (e.g., `Account`, not `account`).
-- If case does not match or the Developer Name does not map (e.g., using `Account` as Developer Name), the framework will not find the configuration and operations will not run.
+- Case sensitivity and naming rules:
+  - Always match the Standard SObject API Name exactly in case (e.g., `Account`, not `account`).
+  - If case does not match or the Developer Name does not map (e.g., using `Account` as Developer Name), the framework will not find the configuration and operations will not run.
 
-2) Enable only Before Insert and After Update for Account
+#### 2) Enable only Before Insert and After Update for Account
 - `Active` (Active__c) = true
 - `Before Insert` (Before_Insert__c) = true
 - `After Update` (After_Update__c) = true
 - All other operation flags = false
 
-3) Custom Object example (Booking__c)
-- IMPORTANT: Use the exact SObject API Name with correct case for the "Object Name" reference in your org, but when creating the Custom Metadata record, set the `Trigger Registry Name` (DeveloperName) to Booking (without `__c`) because Developer Name cannot include "`__`".
+#### 3) Custom Object example (Booking__c)
+**IMPORTANT**: Use the exact SObject API Name with correct case for the "Object Name" reference in your org, but when creating the Custom Metadata record, set the `Trigger Registry Name` (DeveloperName) to Booking (without `__c`) because Developer Name cannot include "`__`".
 - Record: `Trigger Registry Name` (DeveloperName) = Booking
 - This record controls the handler for the SObject API Name `Booking__c`
 - Typical configuration to enable only After Insert:
@@ -68,17 +68,17 @@ Case sensitivity and naming rules:
   - `After Insert` (After_Insert__c) = true
   - All other operation flags = false
 
-Case sensitivity and naming rules:
+### Case sensitivity and naming rules:
 - Always match the Custom SObject API Name exactly in case (e.g., `Booking__c`, not `booking__c`).
 - Custom Metadata Type `Trigger Registry Name` (DeveloperName) must NOT include "__c". For `Booking__c`, use `Booking`.
 - If case does not match or the Developer Name does not map (e.g., using `Booking__c` as Developer Name), the framework will not find the configuration and operations will not run.
 
-Programmatic, context-based skip:
+### Programmatic, context-based skip:
 - For targeted scenarios (e.g., batch or data-migration transactions), skip execution without changing metadata:
   - Example: `TriggerBase.skippedTriggers.add(Account.SObjectType);`
 - Use this sparingly; prefer metadata flags for normal release management
 
-Recommended practice:
+### Recommended practice:
 - Use `Active` (Active__c) and the operation flags for environment-level control
 - Use programmatic skip only for temporary, contextual needs in code
 
@@ -156,6 +156,9 @@ public with sharing class AccountTriggerHandler extends TriggerBase {
     protected override void beforeInsert() {
         if (!isBeforeInsert) return;
         // bulkified logic here, operate on (List<Account>) newList
+        for (Account acc : (List<Account>) this.newList) {
+          acc.Name = acc.Name + ' (New)';
+        }
     }
 
     // override other lifecycle methods as needed (beforeUpdate, afterUpdate, etc.)
@@ -188,17 +191,9 @@ Registry Custom Metadata Type record:
 - One trigger per object
 - No SOQL/DML in loops; bulkify all logic
 - Use `Database` methods with proper exception handling, prefer user mode as appropriate
-- Respect FLS/sharing (use `with sharing` appropriately)
+- Respect FLS/sharing rules (use `with sharing`, `inherited sharing` or `without sharing` appropriately)
 - Avoid recursion with `ExecutionCount` and early returns
-- Favor enums over strings for internal constants
 - Keep handlers thin; move business logic to services for testability
-
-## Roadmap
-
-- Add full set of `Trigger_Registry__mdt` fields and list views
-- Provide more sample handlers and service abstractions
-- Provide invocable actions and flows for admin configuration
-- Add example DI factory and mocks
 
 ## Contributing
 
