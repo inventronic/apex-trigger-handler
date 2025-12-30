@@ -82,6 +82,82 @@ What you can control (Label (API Name)):
 - Use `Active` (Active__c) and the operation flags for environment-level control
 - Use programmatic skip only for temporary, contextual needs in code
 
+## Naming Convention and Templates
+
+### Recommended naming convention:
+- Trigger file: <SObjectName>Trigger
+- Handler class: <SObjectName>TriggerHandler
+
+### Examples:
+- Standard object: AccountTrigger, AccountTriggerHandler
+- Custom object: BookingTrigger, BookingTriggerHandler (for SObject API Name Booking__c)
+
+**Important**:
+- Use the exact SObject API Name's case when referencing types in Apex (e.g., Account.SObjectType, Booking__c.SObjectType).
+- Custom Metadata "Trigger Registry Name" (DeveloperName) must equal the SObject base name without "__c" (e.g., `Booking` for `Booking__c`).
+
+### Trigger template:
+```apex
+trigger <SObjectName>Trigger on <SObjectName>(
+  before insert,
+  before update,
+  before delete,
+  after insert,
+  after update,
+  after delete,
+  after undelete
+) {
+  TriggerBase.run(<SObjectName>TriggerHandler.class);
+}
+```
+
+### Handler template:
+```apex
+public with sharing class <SObjectName>TriggerHandler extends TriggerBase {
+    public <SObjectName>TriggerHandler() {
+        super(<SObjectName>.SObjectType); // For custom objects use <SObjectName>__c.SObjectType
+    }
+
+    // Override only what you need. Always early-return using the framework flags.
+    protected override void beforeInsert() {
+        if (!isBeforeInsert) return;
+        // bulkified logic using (List<<SObjectName>>) newList
+    }
+
+    protected override void beforeUpdate() {
+        if (!isBeforeUpdate) return;
+        // use (List<<SObjectName>>) newList and (List<<SObjectName>>) oldList
+    }
+
+    protected override void afterInsert() {
+        if (!isAfterInsert) return;
+        // logic here
+    }
+
+    // Add other lifecycle overrides as needed: beforeDelete, afterUpdate, afterDelete, afterUndelete
+}
+```
+
+### Custom object example (Booking__c):
+```apex
+trigger BookingTrigger on Booking__c(
+  before insert, before update, after insert, after update
+) {
+  TriggerBase.run(BookingTriggerHandler.class);
+}
+
+public with sharing class BookingTriggerHandler extends TriggerBase {
+    public BookingTriggerHandler() {
+        super(Booking__c.SObjectType);
+    }
+
+    protected override void afterInsert() {
+        if (!isAfterInsert) return;
+        // Example logic on (List<Booking__c>) newList
+    }
+}
+```
+
 ## Goals
 
 - Decouple trigger plumbing from business logic
@@ -127,7 +203,7 @@ Recommended fields (Label (API Name)):
 - `Max Execution Count` (Max_Execution_Count__c) — Number, execution depth guard (e.g., 5)
 
 Behavior:
-- When a registry record exists for a given Salesforce Object (SObject), its flags control which lifecycle callbacks execute for that SObject’s handler. If a flag or the record is missing, the respective operation will not run (the handler’s `isXyz` checks remain false).
+- When a registry record exists for a given Salesforce Object (SObject), its flags control which lifecycle callbacks execute for that SObject's handler. If a flag or the record is missing, the respective operation will not run (the handler's `isXyz` checks remain false).
 
 ## Usage Example (Account)
 
