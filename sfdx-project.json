@@ -1,8 +1,8 @@
 {
   "packageDirectories": [
     {
-      "versionName": "ver 0.1",
-      "versionNumber": "0.1.2.NEXT",
+      "versionName": "Version 2.0",
+      "versionNumber": "2.0.0.NEXT",
       "path": "force-app",
       "default": true,
       "package": "Apex Trigger Handler",
@@ -12,7 +12,7 @@
   "name": "ApexTriggerHandler",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "64.0",
+  "sourceApiVersion": "65.0",
   "packageAliases": {
     "Apex Trigger Handler": "0HoIU0000004CHv0AM",
     "Apex Trigger Handler@0.1.0-1": "04tIU000000ylCVYAY",
@@ -20,6 +20,10 @@
     "Apex Trigger Handler@0.1.0-3": "04tIU000000ylCfYAI",
     "Apex Trigger Handler@0.1.0-4": "04tIU000000ylCkYAI",
     "Apex Trigger Handler@0.1.1-1": "04tIU000000ylCpYAI",
-    "Apex Trigger Handler@0.1.2-1": "04tIU000000ylCuYAI"
+    "Apex Trigger Handler@0.1.2-1": "04tIU000000ylCuYAI",
+    "Apex Trigger Handler@1.0.0-1": "04tIU000000r93dYAA",
+    "Apex Trigger Handler@1.0.0-2": "04tIU000000r93nYAA",
+    "Apex Trigger Handler@1.0.0-3": "04tIU000000r93sYAA",
+    "Apex Trigger Handler@2.0.0-1": "04tIU000000r93xYAA"
   }
 }

@@ -227,7 +227,7 @@ public abstract class TriggerBase {
     this.isActiveAfterUndelete = false;
     try {
       Trigger_Registry__mdt triggerData = Trigger_Registry__mdt.getInstance(
-        objectName
+        objectName?.removeEndIgnoreCase('__c')?.trim()
       );
 
       if (Test.isRunningTest()) {
